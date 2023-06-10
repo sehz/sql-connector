@@ -70,7 +70,10 @@ impl Db {
             Db::DuckDb(conn) => {
                 use crate::duckdb::insert;
 
-                insert(conn,&table, values)
+                if let Err(err) = insert(conn,&table, values) {
+                    error!("unable to insert duckdb: {}",err);
+                }
+                Ok(())
             }
         }
     }

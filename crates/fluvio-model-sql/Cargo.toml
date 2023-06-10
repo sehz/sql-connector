@@ -10,3 +10,4 @@ description = "The data model intended for using inside SQL connector"
 [dependencies]
 serde = { version = "1", default-features = false, features = ["derive", "std"] }
 duckdb = { version = "0.8.0"}
+chrono = "0.4.26"

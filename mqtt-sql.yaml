@@ -45,3 +45,13 @@ transforms:
             value:
               type: "int"
               required: true
+          "speed":
+            json-key: "speed"
+            value:
+              type: "float"
+              required: true
+          "time":
+            json-key: "tst"
+            value:
+              type: "timestamp"
+              required: true
