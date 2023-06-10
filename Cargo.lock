@@ -1472,6 +1472,7 @@ dependencies = [
 name = "fluvio-model-sql"
 version = "0.0.0"
 dependencies = [
+ "duckdb",
  "serde",
 ]
 
