@@ -1470,8 +1470,9 @@ dependencies = [
 
 [[package]]
 name = "fluvio-model-sql"
-version = "0.0.1"
+version = "0.0.0"
 dependencies = [
+ "duckdb",
  "serde",
 ]
 
@@ -3403,7 +3404,7 @@ dependencies = [
 
 [[package]]
 name = "sql-sink"
-version = "0.2.1"
+version = "0.0.0"
 dependencies = [
  "anyhow",
  "async-std",
