@@ -13,30 +13,39 @@ use sqlx::{
 };
 use std::str::FromStr;
 
+use duckdb::Connection as DuckDbConnection;
+
 const NAIVE_DATE_TIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S%.f";
 
 pub enum Db {
     Postgres(Box<PgConnection>),
     Sqlite(Box<SqliteConnection>),
+    DuckDb(Box<DuckDbConnection>),
 }
 
 impl Db {
     pub async fn connect(url: &str) -> anyhow::Result<Self> {
-        let options = AnyConnectOptions::from_str(url)?;
-        match options.kind() {
-            AnyKind::Postgres => {
-                let options = options
-                    .as_postgres()
-                    .ok_or_else(|| anyhow!("invalid postgres connect options"))?;
-                let conn = PgConnection::connect_with(options).await?;
-                Ok(Db::Postgres(Box::new(conn)))
-            }
-            AnyKind::Sqlite => {
-                let options = options
-                    .as_sqlite()
-                    .ok_or_else(|| anyhow!("invalid sqlite connect options"))?;
-                let conn = SqliteConnection::connect_with(options).await?;
-                Ok(Db::Sqlite(Box::new(conn)))
+        // check if it starts with md
+        if url.starts_with("md:") {
+            let conn = DuckDbConnection::open(url)?;
+            Ok(Db::DuckDb(Box::new(conn)))
+        } else {
+            let options = AnyConnectOptions::from_str(url)?;
+            match options.kind() {
+                AnyKind::Postgres => {
+                    let options = options
+                        .as_postgres()
+                        .ok_or_else(|| anyhow!("invalid postgres connect options"))?;
+                    let conn = PgConnection::connect_with(options).await?;
+                    Ok(Db::Postgres(Box::new(conn)))
+                }
+                AnyKind::Sqlite => {
+                    let options = options
+                        .as_sqlite()
+                        .ok_or_else(|| anyhow!("invalid sqlite connect options"))?;
+                    let conn = SqliteConnection::connect_with(options).await?;
+                    Ok(Db::Sqlite(Box::new(conn)))
+                }
             }
         }
     }
@@ -58,6 +67,11 @@ impl Db {
             Db::Sqlite(conn) => {
                 do_insert::<Sqlite, &mut SqliteConnection, Self>(conn.as_mut(), table, values).await
             }
+            Db::DuckDb(conn) => {
+                use crate::duckdb::insert;
+
+                insert(conn,&table, values)
+            }
         }
     }
 
@@ -65,6 +79,7 @@ impl Db {
         match self {
             Db::Postgres(_) => "postgres",
             Db::Sqlite(_) => "sqlite",
+            Db::DuckDb(_) => "duckdb",
         }
     }
 }
