@@ -1,11 +1,9 @@
-use duckdb::{Connection, params_from_iter};
 use anyhow::Result;
+use duckdb::{params_from_iter, Connection};
 
 use fluvio_model_sql::Value;
 
-
 pub(crate) fn insert(conn: &Connection, table: &str, values: Vec<Value>) -> Result<()> {
-
     let mut query = String::from("INSERT INTO ");
     query.push_str(table);
     query.push_str(" (");
@@ -23,8 +21,8 @@ pub(crate) fn insert(conn: &Connection, table: &str, values: Vec<Value>) -> Resu
     query.push_str(")");
 
     let mut stmt = conn.prepare(&query)?;
-    let params  = params_from_iter(&values);
+    let params = params_from_iter(&values);
     stmt.execute(params)?;
-   
+
     Ok(())
 }

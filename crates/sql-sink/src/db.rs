@@ -19,6 +19,7 @@ use duckdb::Connection as DuckDbConnection;
 
 const NAIVE_DATE_TIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S%.f";
 const DUCKDB_PREFIX: &str = "duckdb://";
+const MOTHERDUCK_PREFIX: &str = "md:";
 
 pub enum Db {
     Postgres(Box<PgConnection>),
@@ -28,10 +29,14 @@ pub enum Db {
 
 impl Db {
     pub async fn connect(url: &str) -> anyhow::Result<Self> {
+        println!("connecting to db: {}", url);
         // check if it starts with md
         if let Some(duckdb_path) = url.strip_prefix(DUCKDB_PREFIX) {
-            println!("opening duckdb: {}",duckdb_path);
+            println!("opening duckdb: {}", duckdb_path);
             let conn = DuckDbConnection::open(duckdb_path)?;
+            Ok(Db::DuckDb(Box::new(conn)))
+        } else if url.starts_with(MOTHERDUCK_PREFIX) {
+            let conn = DuckDbConnection::open(url)?;
             Ok(Db::DuckDb(Box::new(conn)))
         } else {
             let options = AnyConnectOptions::from_str(url)?;
@@ -74,8 +79,8 @@ impl Db {
             Db::DuckDb(conn) => {
                 use crate::duckdb::insert;
 
-                if let Err(err) = insert(conn,&table, values) {
-                    error!("unable to insert duckdb: {}",err);
+                if let Err(err) = insert(conn, &table, values) {
+                    error!("unable to insert duckdb: {}", err);
                 }
                 Ok(())
             }
