@@ -9,7 +9,7 @@ meta:
 
 
 sql:
-  url: duckdb://md:?token=${{ secrets.MD_TOKEN }}
+  url: "md:?token=${{ secrets.MD_TOKEN }}"
 transforms:
   - uses: infinyon/jolt@0.1.0
     with:

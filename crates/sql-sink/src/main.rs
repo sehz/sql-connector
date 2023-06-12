@@ -1,7 +1,7 @@
 mod config;
 mod db;
-mod sink;
 mod duckdb;
+mod sink;
 
 use config::SqlConfig;
 use fluvio_connector_common::{connector, consumer::ConsumerStream, tracing::trace, Result, Sink};
