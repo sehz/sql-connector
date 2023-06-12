@@ -6,4 +6,7 @@ build:
 	cdk build -p sql-sink
 
 test:
-	cdk test -p sql-sink --config mqtt-sql.yaml --secrets .env
+	cdk test  --release release  -p sql-sink --config mqtt-sql.yaml --secrets .env
+
+test_local:
+	cdk test  --release release  -p sql-sink --config mqtt-duck.yaml

@@ -4,12 +4,10 @@ meta:
   name: helsinki-sql
   type: sql-sink
   topic: helsinki
-  secrets:
-    - name: MD_TOKEN
 
 
 sql:
-  url: duckdb://md:?token=${{ secrets.MD_TOKEN }}
+  url: duckdb://test.db
 transforms:
   - uses: infinyon/jolt@0.1.0
     with:

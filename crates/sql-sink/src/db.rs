@@ -16,6 +16,7 @@ use std::str::FromStr;
 use duckdb::Connection as DuckDbConnection;
 
 const NAIVE_DATE_TIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S%.f";
+const DUCKDB_PREFIX: &str = "duckdb://";
 
 pub enum Db {
     Postgres(Box<PgConnection>),
@@ -26,8 +27,9 @@ pub enum Db {
 impl Db {
     pub async fn connect(url: &str) -> anyhow::Result<Self> {
         // check if it starts with md
-        if url.starts_with("md:") {
-            let conn = DuckDbConnection::open(url)?;
+        if let Some(duckdb_path) = url.strip_prefix(DUCKDB_PREFIX) {
+            println!("opening duckdb: {}",duckdb_path);
+            let conn = DuckDbConnection::open(duckdb_path)?;
             Ok(Db::DuckDb(Box::new(conn)))
         } else {
             let options = AnyConnectOptions::from_str(url)?;
