@@ -60,14 +60,6 @@ impl Db {
             Db::Sqlite(conn) => {
                 do_insert::<Sqlite, &mut SqliteConnection, Self>(conn.as_mut(), table, values).await
             }
-            Db::DuckDb(conn) => {
-                use crate::duckdb::insert;
-
-                if let Err(err) = insert(conn, &table, values) {
-                    error!("unable to insert duckdb: {}", err);
-                }
-                Ok(())
-            }
         }
     }
 

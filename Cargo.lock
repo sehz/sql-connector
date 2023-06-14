@@ -1182,11 +1182,9 @@ dependencies = [
  "fluvio-connector-common",
  "fluvio-model-sql",
  "futures",
- "itertools",
  "rust_decimal",
  "serde",
  "serde_json",
- "sqlx",
  "url",
  "uuid",
 ]
