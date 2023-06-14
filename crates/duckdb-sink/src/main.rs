@@ -1,5 +1,6 @@
 mod config;
 mod db;
+mod duckdb;
 mod sink;
 
 use config::SqlConfig;

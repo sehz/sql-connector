@@ -15,30 +15,46 @@ use sqlx::{
 use fluvio_connector_common::tracing::{debug, error};
 use fluvio_model_sql::{Operation, Type, Value};
 
+use duckdb::Connection as DuckDbConnection;
+
 const NAIVE_DATE_TIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S%.f";
+const DUCKDB_PREFIX: &str = "duckdb://";
+const MOTHERDUCK_PREFIX: &str = "md:";
 
 pub enum Db {
     Postgres(Box<PgConnection>),
     Sqlite(Box<SqliteConnection>),
+    DuckDb(Box<DuckDbConnection>),
 }
 
 impl Db {
     pub async fn connect(url: &str) -> anyhow::Result<Self> {
-        let options = AnyConnectOptions::from_str(url)?;
-        match options.kind() {
-            AnyKind::Postgres => {
-                let options = options
-                    .as_postgres()
-                    .ok_or_else(|| anyhow!("invalid postgres connect options"))?;
-                let conn = PgConnection::connect_with(options).await?;
-                Ok(Db::Postgres(Box::new(conn)))
-            }
-            AnyKind::Sqlite => {
-                let options = options
-                    .as_sqlite()
-                    .ok_or_else(|| anyhow!("invalid sqlite connect options"))?;
-                let conn = SqliteConnection::connect_with(options).await?;
-                Ok(Db::Sqlite(Box::new(conn)))
+        println!("connecting to db: {}", url);
+        // check if it starts with md
+        if let Some(duckdb_path) = url.strip_prefix(DUCKDB_PREFIX) {
+            println!("opening duckdb: {}", duckdb_path);
+            let conn = DuckDbConnection::open(duckdb_path)?;
+            Ok(Db::DuckDb(Box::new(conn)))
+        } else if url.starts_with(MOTHERDUCK_PREFIX) {
+            let conn = DuckDbConnection::open(url)?;
+            Ok(Db::DuckDb(Box::new(conn)))
+        } else {
+            let options = AnyConnectOptions::from_str(url)?;
+            match options.kind() {
+                AnyKind::Postgres => {
+                    let options = options
+                        .as_postgres()
+                        .ok_or_else(|| anyhow!("invalid postgres connect options"))?;
+                    let conn = PgConnection::connect_with(options).await?;
+                    Ok(Db::Postgres(Box::new(conn)))
+                }
+                AnyKind::Sqlite => {
+                    let options = options
+                        .as_sqlite()
+                        .ok_or_else(|| anyhow!("invalid sqlite connect options"))?;
+                    let conn = SqliteConnection::connect_with(options).await?;
+                    Ok(Db::Sqlite(Box::new(conn)))
+                }
             }
         }
     }
@@ -75,6 +91,7 @@ impl Db {
         match self {
             Db::Postgres(_) => "postgres",
             Db::Sqlite(_) => "sqlite",
+            Db::DuckDb(_) => "duckdb",
         }
     }
 }

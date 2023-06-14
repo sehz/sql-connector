@@ -1170,6 +1170,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "duckdb-sink"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "async-std",
+ "async-trait",
+ "chrono",
+ "duckdb",
+ "fluvio",
+ "fluvio-connector-common",
+ "fluvio-model-sql",
+ "futures",
+ "itertools",
+ "rust_decimal",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "url",
+ "uuid",
+]
+
+[[package]]
 name = "educe"
 version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3411,7 +3433,6 @@ dependencies = [
  "async-std",
  "async-trait",
  "chrono",
- "duckdb",
  "fluvio",
  "fluvio-connector-common",
  "fluvio-model-sql",
