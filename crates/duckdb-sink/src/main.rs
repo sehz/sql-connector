@@ -1,6 +1,7 @@
 mod config;
 mod db;
 mod sink;
+mod model;
 
 use config::DuckdbConfig;
 use fluvio_connector_common::{connector, consumer::ConsumerStream, tracing::trace, Result, Sink};
