@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/sql-sink",
+    "crates/duckdb-sink",
     "crates/fluvio-model-sql",
     "crates/integration-tests",
 ]
